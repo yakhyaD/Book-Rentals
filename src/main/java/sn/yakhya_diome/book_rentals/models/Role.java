@@ -17,7 +17,8 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 10)
+    @Enumerated(EnumType.STRING)
+    @Column(length = 15, unique = true)
     private ERole name;
 
     // many to many relationship with user
