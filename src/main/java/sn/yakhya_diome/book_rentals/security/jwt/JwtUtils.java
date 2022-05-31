@@ -1,14 +1,18 @@
 package sn.yakhya_diome.book_rentals.security.jwt;
 
 import io.jsonwebtoken.*;
-import org.slf4j.LoggerFactory;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 import sn.yakhya_diome.book_rentals.services.UserDetailsImpl;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Date;
+import java.util.stream.Collectors;
 
 /*
 * generate a JWT from username, date, expiration, secret
@@ -16,6 +20,8 @@ import java.util.Date;
   validate a JWT
 */
 
+@AllArgsConstructor
+@NoArgsConstructor
 @Component
 public class JwtUtils {
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
@@ -29,13 +35,20 @@ public class JwtUtils {
   public String generateJwtToken(Authentication authentication) {
 
     UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
+    Claims claims = Jwts.claims().setSubject(userPrincipal.getId().toString());
+
+    String roles = userPrincipal.getAuthorities().stream()
+            .map(GrantedAuthority::getAuthority)
+            .collect(Collectors.joining(" "));
+
+    claims.put("roles", roles);
 
     return Jwts.builder()
-        .setSubject((userPrincipal.getUsername()))
-        .setIssuedAt(new Date())
-        .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-        .signWith(SignatureAlgorithm.HS512, jwtSecret)
-        .compact();
+            .setClaims(claims)
+            .setIssuedAt(new Date())
+            .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+            .signWith(SignatureAlgorithm.HS512, jwtSecret)
+            .compact();
   }
 
   public String getUserNameFromJwtToken(String token) {

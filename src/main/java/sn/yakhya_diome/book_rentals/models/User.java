@@ -42,7 +42,8 @@ public class User {
     @Column(length = 200)
     private String location;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+
+    @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     @JoinTable(
             name = "role_users",
             joinColumns = @JoinColumn(name = "user_id"),
