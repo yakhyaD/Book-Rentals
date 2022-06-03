@@ -26,18 +26,18 @@ public class Book {
     @NotNull
     private String author;
 
-    @Column(length = 20, unique = true)
+    @Column(unique = true)
     @NotNull
     private String isbn;
 
-    @Column(length = 250)
+    @Column(length = 1000)
     @NotNull
     private String description;
 
     private Boolean available = false;
 
     // one book has one publisher(user)
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User publisher;
 

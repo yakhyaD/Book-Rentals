@@ -18,7 +18,7 @@ import sn.yakhya_diome.book_rentals.models.User;
 import sn.yakhya_diome.book_rentals.payload.request.LoginRequest;
 import sn.yakhya_diome.book_rentals.payload.request.RegisterRequest;
 import sn.yakhya_diome.book_rentals.payload.response.JwtResponse;
-import sn.yakhya_diome.book_rentals.repository.RoleRepsitory;
+import sn.yakhya_diome.book_rentals.repository.RoleRepository;
 import sn.yakhya_diome.book_rentals.repository.UserRepository;
 import sn.yakhya_diome.book_rentals.security.jwt.JwtUtils;
 import sn.yakhya_diome.book_rentals.services.AuthService;
@@ -38,7 +38,7 @@ public class AuthServiceImpl implements AuthService {
     private UserRepository userRepository;
 
     @Autowired
-    private RoleRepsitory roleRepository;
+    private RoleRepository roleRepository;
 
     @Autowired
     private AuthenticationManager authenticationManager;
