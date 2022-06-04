@@ -52,6 +52,8 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id")
 
     )
+
+    @JsonIgnore
     private Set<Role> roles = new HashSet<>();
 
 

@@ -1,5 +1,6 @@
 package sn.yakhya_diome.book_rentals.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -9,22 +10,22 @@ import sn.yakhya_diome.book_rentals.services.Impl.BookServiceImpl;
 
 import java.util.List;
 
-
 @RestController
-@RequestMapping("api/v1/admin/books")
-@PreAuthorize("hasRole('ROLE_ADMIN')")
-public class AdminBookController {
+@RequestMapping("api/v1/creator/books")
+@PreAuthorize("hasRole('ROLE_CREATOR')")
+public class CreatorBookController {
 
     @Autowired
     private BookServiceImpl bookService;
 
+
     @GetMapping
-    public List<Book> getBooks(){
-        return bookService.getBooks();
+    public List<Book> getCreatorBooks(@RequestHeader("Authorization") String token){
+       return bookService.getCreatorBooks(token);
     }
 
     @GetMapping("/{id}")
-    public Book getBook(@PathVariable Long id){
+    public Book getBook(@PathVariable("id") Long id){
         return bookService.getBook(id);
     }
 
@@ -42,4 +43,5 @@ public class AdminBookController {
     public void deleteBook(@PathVariable Long id, @RequestHeader("Authorization") String token){
         bookService.deleteBook(id, token);
     }
+
 }

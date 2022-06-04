@@ -56,6 +56,7 @@ public class AppSecurityConfig {
                 .authorizeHttpRequests((auth) -> auth
                         .antMatchers("/api/v1/auth/**").permitAll()
                         .antMatchers("/api/v1/admin/**").hasAuthority(ERole.ROLE_ADMIN.name())
+                        .antMatchers("/api/v1/creator/**").hasAuthority(ERole.ROLE_CREATOR.name())
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class)

@@ -9,13 +9,14 @@ import sn.yakhya_diome.book_rentals.exceptions.UnauthorizedException;
 import sn.yakhya_diome.book_rentals.models.Book;
 import sn.yakhya_diome.book_rentals.models.ERole;
 import sn.yakhya_diome.book_rentals.models.User;
-import sn.yakhya_diome.book_rentals.payload.request.bookBody;
+import sn.yakhya_diome.book_rentals.payload.request.BookBody;
 import sn.yakhya_diome.book_rentals.repository.BookRepository;
 import sn.yakhya_diome.book_rentals.repository.UserRepository;
 import sn.yakhya_diome.book_rentals.security.jwt.JwtUtils;
 import sn.yakhya_diome.book_rentals.services.BookService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -35,7 +36,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public String addBook(bookBody newBook, String token) {
+    public String addBook(BookBody newBook, String token) {
         String jwtToken = token.substring(7);
         String username = jwtUtils.getUserNameFromJwtToken(jwtToken);
 
@@ -64,10 +65,19 @@ public class BookServiceImpl implements BookService {
         );
     }
 
-    public String updateBook(Long id, bookBody updatedBook) {
+    public String updateBook(Long id, BookBody updatedBook, String token) {
+        String username = jwtUtils.getUserNameFromJwtToken(token.substring(7));
+        Claims claims =  jwtUtils.geRolesFromJwtToken(token.substring(7));
+
         Book bookToBeUpdated = bookRepository.findById(id).orElseThrow(() ->
                 new NotFoundException(String.format("Book with id %d doesn't exist", id))
         );
+
+        if (!claims.get("roles").toString().contains(ERole.ROLE_ADMIN.name())) {
+            if (!claims.get("roles").toString().contains(ERole.ROLE_CREATOR.name())||!bookToBeUpdated.getPublisher().getUsername().equals(username)) {
+                throw new UnauthorizedException("Unauthorized!");
+            }
+        }
         bookToBeUpdated.setTitle(updatedBook.getTitle() == null ? bookToBeUpdated.getTitle() : updatedBook.getTitle());
         bookToBeUpdated.setAuthor(updatedBook.getAuthor() == null ? bookToBeUpdated.getAuthor() : updatedBook.getAuthor());
         bookToBeUpdated.setIsbn(updatedBook.getIsbn() == null ? bookToBeUpdated.getIsbn() : updatedBook.getIsbn());
@@ -93,6 +103,18 @@ public class BookServiceImpl implements BookService {
             }
         }
         bookRepository.delete(book);
+    }
+
+    @Override
+    public List<Book> getCreatorBooks(String token) {
+        String creatorUsername = jwtUtils.getUserNameFromJwtToken(token.substring(7));
+
+        User creator = userRepository.findByUsername(creatorUsername).orElseThrow(
+                () -> new NotFoundException("user not found")
+        );
+        return getBooks().stream()
+                .filter((book) -> book.getPublisher().getUsername().equals(creator.getUsername()))
+                .collect(Collectors.toList());
     }
 
 }
