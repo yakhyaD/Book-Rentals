@@ -4,6 +4,8 @@ import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sn.yakhya_diome.book_rentals.exceptions.NotFoundException;
+import sn.yakhya_diome.book_rentals.exceptions.UnauthorizedException;
 import sn.yakhya_diome.book_rentals.models.Book;
 import sn.yakhya_diome.book_rentals.models.ERole;
 import sn.yakhya_diome.book_rentals.models.User;
@@ -37,7 +39,9 @@ public class BookServiceImpl implements BookService {
         String jwtToken = token.substring(7);
         String username = jwtUtils.getUserNameFromJwtToken(jwtToken);
 
-        User publisher = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+        User publisher = userRepository.findByUsername(username).orElseThrow(
+                () -> new NotFoundException("User not found")
+        );
 
         Book book = Book.builder()
                 .title(newBook.getTitle())
@@ -49,19 +53,20 @@ public class BookServiceImpl implements BookService {
                 .available(false)
                 .build();
         bookRepository.save(book);
+
         return "Book added successfully";
     }
 
     @Override
     public Book getBook(Long id) {
         return bookRepository.findById(id).orElseThrow(() ->
-                new IllegalArgumentException(String.format("Book with id %d doesn't exist", id))
+                new NotFoundException(String.format("Book with id %d doesn't exist", id))
         );
     }
 
     public String updateBook(Long id, bookBody updatedBook) {
         Book bookToBeUpdated = bookRepository.findById(id).orElseThrow(() ->
-                new IllegalArgumentException(String.format("Book with id %d doesn't exist", id))
+                new NotFoundException(String.format("Book with id %d doesn't exist", id))
         );
         bookToBeUpdated.setTitle(updatedBook.getTitle() == null ? bookToBeUpdated.getTitle() : updatedBook.getTitle());
         bookToBeUpdated.setAuthor(updatedBook.getAuthor() == null ? bookToBeUpdated.getAuthor() : updatedBook.getAuthor());
@@ -84,7 +89,7 @@ public class BookServiceImpl implements BookService {
         );
         if (!claims.get("roles").toString().contains(ERole.ROLE_ADMIN.name())) {
             if (!claims.get("roles").toString().contains(ERole.ROLE_CREATOR.name())||!book.getPublisher().getUsername().equals(username)) {
-                throw new IllegalStateException("Unauthorized!");
+                throw new UnauthorizedException("Unauthorized!");
             }
         }
         bookRepository.delete(book);
