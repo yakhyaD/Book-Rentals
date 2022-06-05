@@ -19,4 +19,6 @@ public interface BookService {
     void deleteBook(Long id, String token);
 
     List<Book> getCreatorBooks(String token);
+
+    List<Book> getAllAvailableBooks();
 }

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.Customizer;
@@ -57,6 +58,8 @@ public class AppSecurityConfig {
                         .antMatchers("/api/v1/auth/**").permitAll()
                         .antMatchers("/api/v1/admin/**").hasAuthority(ERole.ROLE_ADMIN.name())
                         .antMatchers("/api/v1/creator/**").hasAuthority(ERole.ROLE_CREATOR.name())
+                        .antMatchers(HttpMethod.GET, "/api/v1/user/**").permitAll()
+                        .antMatchers("/api/v1/user/**").hasAuthority(ERole.ROLE_USER.name())
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class)

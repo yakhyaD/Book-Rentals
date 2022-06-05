@@ -117,4 +117,12 @@ public class BookServiceImpl implements BookService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<Book> getAllAvailableBooks() {
+        return getBooks()
+                .stream()
+                .filter(Book::getAvailable)
+                .collect(Collectors.toList());
+    }
+
 }
