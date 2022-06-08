@@ -41,6 +41,14 @@ public class Book {
     @JoinColumn(name = "user_id")
     private User publisher;
 
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "cart_id", nullable = true)
+//    private Cart cart;
+//
+//    @ManyToOne(fetch = FetchType.EAGER)
+//    @JoinColumn(name = "rent_id")
+//    private RentDetails rentDetails;
+
 
     private String coverUrl;
 

@@ -59,7 +59,7 @@ public class AppSecurityConfig {
                         .antMatchers("/api/v1/admin/**").hasAuthority(ERole.ROLE_ADMIN.name())
                         .antMatchers("/api/v1/creator/**").hasAuthority(ERole.ROLE_CREATOR.name())
                         .antMatchers(HttpMethod.GET, "/api/v1/user/**").permitAll()
-                        .antMatchers("/api/v1/user/**").hasAuthority(ERole.ROLE_USER.name())
+                        .antMatchers("/api/v1/user/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class)

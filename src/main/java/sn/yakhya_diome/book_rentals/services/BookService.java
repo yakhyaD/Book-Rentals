@@ -1,9 +1,11 @@
 package sn.yakhya_diome.book_rentals.services;
 
 import sn.yakhya_diome.book_rentals.models.Book;
+import sn.yakhya_diome.book_rentals.models.Cart;
 import sn.yakhya_diome.book_rentals.payload.request.BookBody;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface BookService {
 
@@ -21,4 +23,5 @@ public interface BookService {
     List<Book> getCreatorBooks(String token);
 
     List<Book> getAllAvailableBooks();
+
 }

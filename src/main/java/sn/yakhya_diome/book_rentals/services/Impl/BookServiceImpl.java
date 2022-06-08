@@ -7,15 +7,19 @@ import org.springframework.stereotype.Service;
 import sn.yakhya_diome.book_rentals.exceptions.NotFoundException;
 import sn.yakhya_diome.book_rentals.exceptions.UnauthorizedException;
 import sn.yakhya_diome.book_rentals.models.Book;
+import sn.yakhya_diome.book_rentals.models.Cart;
 import sn.yakhya_diome.book_rentals.models.ERole;
 import sn.yakhya_diome.book_rentals.models.User;
 import sn.yakhya_diome.book_rentals.payload.request.BookBody;
 import sn.yakhya_diome.book_rentals.repository.BookRepository;
+import sn.yakhya_diome.book_rentals.repository.CartRepository;
 import sn.yakhya_diome.book_rentals.repository.UserRepository;
 import sn.yakhya_diome.book_rentals.security.jwt.JwtUtils;
 import sn.yakhya_diome.book_rentals.services.BookService;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,6 +33,9 @@ public class BookServiceImpl implements BookService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private CartRepository cartRepository;
 
     @Override
     public List<Book> getBooks() {
@@ -124,5 +131,31 @@ public class BookServiceImpl implements BookService {
                 .filter(Book::getAvailable)
                 .collect(Collectors.toList());
     }
+
+
+
+//    @Override
+//    public String addMultipleBooks(List<Book> books, String token) {
+//        String jwtToken = token.substring(7);
+//        String username = jwtUtils.getUserNameFromJwtToken(jwtToken);
+//
+//        User publisher = userRepository.findByUsername(username).orElseThrow(
+//                () -> new NotFoundException("User not found")
+//        );
+//
+//        List<Book> bookList = books.stream()
+//                        .map((book) -> Book.builder()
+//                                .title(book.getTitle())
+//                                .author(book.getAuthor())
+//                                .isbn(book.getIsbn())
+//                                .coverUrl(book.getCoverUrl())
+//                                .description(book.getDescription())
+//                                .publisher(publisher)
+//                                .available(false)
+//                                .build())
+//                        .collect(Collectors.toList());
+//        bookRepository.saveAll(bookList);
+//        return "Books added successfully";
+//    }
 
 }
