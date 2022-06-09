@@ -8,7 +8,7 @@ import sn.yakhya_diome.book_rentals.models.Role;
 import java.util.Optional;
 
 @Repository
-public interface RoleRepsitory extends JpaRepository<Role, Long> {
+public interface RoleRepository extends JpaRepository<Role, Long> {
 
     Optional<Role> findByName(ERole name);
 }

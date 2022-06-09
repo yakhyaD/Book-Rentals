@@ -35,13 +35,14 @@ public class JwtUtils {
   public String generateJwtToken(Authentication authentication) {
 
     UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
-    Claims claims = Jwts.claims().setSubject(userPrincipal.getId().toString());
+    Claims claims = Jwts.claims().setSubject(userPrincipal.getUsername());
 
     String roles = userPrincipal.getAuthorities().stream()
             .map(GrantedAuthority::getAuthority)
             .collect(Collectors.joining(" "));
 
     claims.put("roles", roles);
+    claims.put("id", userPrincipal.getId());
 
     return Jwts.builder()
             .setClaims(claims)
@@ -55,7 +56,13 @@ public class JwtUtils {
     return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
   }
 
+  public Claims geRolesFromJwtToken(String token) {
+    return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
+  }
+
+
   public boolean validateJwtToken(String authToken) {
+    logger.info("validateToken {}", authToken);
     try {
       Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
       return true;

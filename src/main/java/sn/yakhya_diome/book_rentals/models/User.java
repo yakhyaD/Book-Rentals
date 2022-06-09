@@ -1,6 +1,8 @@
 package sn.yakhya_diome.book_rentals.models;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import javax.persistence.*;
@@ -35,8 +37,8 @@ public class User {
     @Column(length = 12)
     private String phoneNumber;
 
-        @NotNull
-
+    @NotNull
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @Column(length = 200)
@@ -50,6 +52,8 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id")
 
     )
+
+    @JsonIgnore
     private Set<Role> roles = new HashSet<>();
 
 

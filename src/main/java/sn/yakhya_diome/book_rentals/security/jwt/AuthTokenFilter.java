@@ -36,7 +36,6 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
         try {
             String jwt = getJwtFromRequest(request);
-
             if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
                 String username = jwtUtils.getUserNameFromJwtToken(jwt);
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
@@ -57,6 +56,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     private String getJwtFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            logger.info("request token: {}", bearerToken.substring(7, bearerToken.length()));
             return bearerToken.substring(7, bearerToken.length());
         }
         return null;

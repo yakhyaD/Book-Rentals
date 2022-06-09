@@ -26,7 +26,6 @@ public class RentDetails {
     private User user;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "book_id")
     private Set<Book> books = new HashSet<>();
 
     private Boolean returned = false;

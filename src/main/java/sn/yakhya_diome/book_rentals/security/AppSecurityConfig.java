@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.Customizer;
@@ -16,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import sn.yakhya_diome.book_rentals.models.ERole;
 import sn.yakhya_diome.book_rentals.security.jwt.AuthEntryPointJwt;
 import sn.yakhya_diome.book_rentals.security.jwt.AuthTokenFilter;
 import sn.yakhya_diome.book_rentals.services.UserDetailsServiceImpl;
@@ -37,7 +39,6 @@ public class AppSecurityConfig {
     }
 
     @Bean
-    @Order(1)
 	public PasswordEncoder encoder(){
         return new BCryptPasswordEncoder();
     }
@@ -55,6 +56,10 @@ public class AppSecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeHttpRequests((auth) -> auth
                         .antMatchers("/api/v1/auth/**").permitAll()
+                        .antMatchers("/api/v1/admin/**").hasAuthority(ERole.ROLE_ADMIN.name())
+                        .antMatchers("/api/v1/creator/**").hasAuthority(ERole.ROLE_CREATOR.name())
+                        .antMatchers(HttpMethod.GET, "/api/v1/user/**").permitAll()
+                        .antMatchers("/api/v1/user/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class)
