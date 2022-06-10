@@ -17,11 +17,11 @@ public interface BookService {
 
     String updateBook(Long id, BookBody updated, String token);
 
-
     void deleteBook(Long id, String token);
 
     List<Book> getCreatorBooks(String token);
 
     List<Book> getAllAvailableBooks();
 
+    List<Book> searchBooks(String query);
 }

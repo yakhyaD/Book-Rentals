@@ -4,10 +4,7 @@ import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sn.yakhya_diome.book_rentals.exceptions.NotFoundException;
-import sn.yakhya_diome.book_rentals.exceptions.UnauthorizedException;
 import sn.yakhya_diome.book_rentals.models.Book;
-import sn.yakhya_diome.book_rentals.models.Cart;
 import sn.yakhya_diome.book_rentals.models.ERole;
 import sn.yakhya_diome.book_rentals.models.User;
 import sn.yakhya_diome.book_rentals.payload.request.BookBody;
@@ -18,8 +15,7 @@ import sn.yakhya_diome.book_rentals.security.jwt.JwtUtils;
 import sn.yakhya_diome.book_rentals.services.BookService;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,7 +44,7 @@ public class BookServiceImpl implements BookService {
         String username = jwtUtils.getUserNameFromJwtToken(jwtToken);
 
         User publisher = userRepository.findByUsername(username).orElseThrow(
-                () -> new NotFoundException("User not found")
+                () -> new IllegalStateException("User not found")
         );
 
         Book book = Book.builder()
@@ -68,7 +64,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public Book getBook(Long id) {
         return bookRepository.findById(id).orElseThrow(() ->
-                new NotFoundException(String.format("Book with id %d doesn't exist", id))
+                new IllegalStateException(String.format("Book with id %d doesn't exist", id))
         );
     }
 
@@ -77,12 +73,12 @@ public class BookServiceImpl implements BookService {
         Claims claims =  jwtUtils.geRolesFromJwtToken(token.substring(7));
 
         Book bookToBeUpdated = bookRepository.findById(id).orElseThrow(() ->
-                new NotFoundException(String.format("Book with id %d doesn't exist", id))
+                new IllegalStateException(String.format("Book with id %d doesn't exist", id))
         );
 
         if (!claims.get("roles").toString().contains(ERole.ROLE_ADMIN.name())) {
             if (!claims.get("roles").toString().contains(ERole.ROLE_CREATOR.name())||!bookToBeUpdated.getPublisher().getUsername().equals(username)) {
-                throw new UnauthorizedException("Unauthorized!");
+                throw new IllegalStateException("Unauthorized!");
             }
         }
         bookToBeUpdated.setTitle(updatedBook.getTitle() == null ? bookToBeUpdated.getTitle() : updatedBook.getTitle());
@@ -106,7 +102,7 @@ public class BookServiceImpl implements BookService {
         );
         if (!claims.get("roles").toString().contains(ERole.ROLE_ADMIN.name())) {
             if (!claims.get("roles").toString().contains(ERole.ROLE_CREATOR.name())||!book.getPublisher().getUsername().equals(username)) {
-                throw new UnauthorizedException("Unauthorized!");
+                throw new IllegalStateException("Unauthorized!");
             }
         }
         bookRepository.delete(book);
@@ -117,7 +113,7 @@ public class BookServiceImpl implements BookService {
         String creatorUsername = jwtUtils.getUserNameFromJwtToken(token.substring(7));
 
         User creator = userRepository.findByUsername(creatorUsername).orElseThrow(
-                () -> new NotFoundException("user not found")
+                () -> new IllegalStateException("user not found")
         );
         return getBooks().stream()
                 .filter((book) -> book.getPublisher().getUsername().equals(creator.getUsername()))
@@ -132,30 +128,9 @@ public class BookServiceImpl implements BookService {
                 .collect(Collectors.toList());
     }
 
-
-
-//    @Override
-//    public String addMultipleBooks(List<Book> books, String token) {
-//        String jwtToken = token.substring(7);
-//        String username = jwtUtils.getUserNameFromJwtToken(jwtToken);
-//
-//        User publisher = userRepository.findByUsername(username).orElseThrow(
-//                () -> new NotFoundException("User not found")
-//        );
-//
-//        List<Book> bookList = books.stream()
-//                        .map((book) -> Book.builder()
-//                                .title(book.getTitle())
-//                                .author(book.getAuthor())
-//                                .isbn(book.getIsbn())
-//                                .coverUrl(book.getCoverUrl())
-//                                .description(book.getDescription())
-//                                .publisher(publisher)
-//                                .available(false)
-//                                .build())
-//                        .collect(Collectors.toList());
-//        bookRepository.saveAll(bookList);
-//        return "Books added successfully";
-//    }
+    @Override
+    public List<Book> searchBooks(String query){
+        return bookRepository.findByTitleOrAuthor(query.toLowerCase());
+    }
 
 }
