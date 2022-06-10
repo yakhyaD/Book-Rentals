@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import sn.yakhya_diome.book_rentals.exceptions.NotFoundException;
 import sn.yakhya_diome.book_rentals.models.ERole;
 import sn.yakhya_diome.book_rentals.models.Role;
 import sn.yakhya_diome.book_rentals.models.User;
@@ -80,7 +81,7 @@ public class AuthServiceImpl implements AuthService {
 
         if(requestRoles == null){
             Role role = roleRepository.findByName(ERole.ROLE_USER).orElseThrow(
-                    () -> new IllegalStateException("Error: Role is not found.")
+                    () -> new NotFoundException("Error: Role is not found.")
             );
             roles.add(role);
         }
@@ -89,19 +90,19 @@ public class AuthServiceImpl implements AuthService {
                 switch (role) {
                     case "admin" -> {
                         Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN).orElseThrow(
-                                () -> new IllegalStateException("Error: Role is not found.")
+                                () -> new NotFoundException("Error: Role is not found.")
                         );
                         roles.add(adminRole);
                     }
                     case "creator" -> {
                         Role modRole = roleRepository.findByName(ERole.ROLE_CREATOR).orElseThrow(
-                                () -> new IllegalStateException("Error: Role is not found.")
+                                () -> new NotFoundException("Error: Role is not found.")
                         );
                         roles.add(modRole);
                     }
                     default -> {
                         Role userRole = roleRepository.findByName(ERole.ROLE_USER).orElseThrow(
-                                () -> new IllegalStateException("Error: Role is not found.")
+                                () -> new NotFoundException("Error: Role is not found.")
                         );
                         roles.add(userRole);
                     }

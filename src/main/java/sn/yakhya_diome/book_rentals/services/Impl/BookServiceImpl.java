@@ -4,6 +4,8 @@ import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sn.yakhya_diome.book_rentals.exceptions.NotFoundException;
+import sn.yakhya_diome.book_rentals.exceptions.UnauthorizedException;
 import sn.yakhya_diome.book_rentals.models.Book;
 import sn.yakhya_diome.book_rentals.models.ERole;
 import sn.yakhya_diome.book_rentals.models.User;
@@ -44,7 +46,7 @@ public class BookServiceImpl implements BookService {
         String username = jwtUtils.getUserNameFromJwtToken(jwtToken);
 
         User publisher = userRepository.findByUsername(username).orElseThrow(
-                () -> new IllegalStateException("User not found")
+                () -> new NotFoundException("User not found")
         );
 
         Book book = Book.builder()
@@ -64,7 +66,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public Book getBook(Long id) {
         return bookRepository.findById(id).orElseThrow(() ->
-                new IllegalStateException(String.format("Book with id %d doesn't exist", id))
+                new NotFoundException(String.format("Book with id %d doesn't exist", id))
         );
     }
 
@@ -73,12 +75,12 @@ public class BookServiceImpl implements BookService {
         Claims claims =  jwtUtils.geRolesFromJwtToken(token.substring(7));
 
         Book bookToBeUpdated = bookRepository.findById(id).orElseThrow(() ->
-                new IllegalStateException(String.format("Book with id %d doesn't exist", id))
+                new NotFoundException(String.format("Book with id %d doesn't exist", id))
         );
 
         if (!claims.get("roles").toString().contains(ERole.ROLE_ADMIN.name())) {
             if (!claims.get("roles").toString().contains(ERole.ROLE_CREATOR.name())||!bookToBeUpdated.getPublisher().getUsername().equals(username)) {
-                throw new IllegalStateException("Unauthorized!");
+                throw new UnauthorizedException("Unauthorized!");
             }
         }
         bookToBeUpdated.setTitle(updatedBook.getTitle() == null ? bookToBeUpdated.getTitle() : updatedBook.getTitle());
@@ -98,11 +100,11 @@ public class BookServiceImpl implements BookService {
         Claims claims =  jwtUtils.geRolesFromJwtToken(token.substring(7));
 
         Book book = bookRepository.findById(id).orElseThrow(() ->
-                new IllegalArgumentException(String.format("Book with id %d doesn't exist", id))
+                new NotFoundException(String.format("Book with id %d doesn't exist", id))
         );
         if (!claims.get("roles").toString().contains(ERole.ROLE_ADMIN.name())) {
             if (!claims.get("roles").toString().contains(ERole.ROLE_CREATOR.name())||!book.getPublisher().getUsername().equals(username)) {
-                throw new IllegalStateException("Unauthorized!");
+                throw new UnauthorizedException("Unauthorized!");
             }
         }
         bookRepository.delete(book);
@@ -113,7 +115,7 @@ public class BookServiceImpl implements BookService {
         String creatorUsername = jwtUtils.getUserNameFromJwtToken(token.substring(7));
 
         User creator = userRepository.findByUsername(creatorUsername).orElseThrow(
-                () -> new IllegalStateException("user not found")
+                () -> new UnauthorizedException("user not found")
         );
         return getBooks().stream()
                 .filter((book) -> book.getPublisher().getUsername().equals(creator.getUsername()))

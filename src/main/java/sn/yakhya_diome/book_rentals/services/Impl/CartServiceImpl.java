@@ -1,9 +1,9 @@
 package sn.yakhya_diome.book_rentals.services.Impl;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sn.yakhya_diome.book_rentals.exceptions.NotFoundException;
 import sn.yakhya_diome.book_rentals.models.Book;
 import sn.yakhya_diome.book_rentals.models.Cart;
 import sn.yakhya_diome.book_rentals.models.User;
@@ -36,11 +36,8 @@ public class CartServiceImpl implements CartService {
     public Optional<Cart> getUserCart(String token){
         String username = jwtUtils.getUserNameFromJwtToken(token.substring(7));
         User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new IllegalStateException("User not found")
+                () -> new NotFoundException("User not found")
         );
-
-//        Cart cart = cartRepository.findByUserId(user.getId());
-//        log.info("cart: {}", cart.toString());
         return cartRepository.findByUser(user);
     }
 
@@ -52,11 +49,11 @@ public class CartServiceImpl implements CartService {
         User user = userRepository.findByUsername(jwtUtils
                 .getUserNameFromJwtToken(token.substring(7)))
                 .orElseThrow(
-                    () -> new IllegalStateException("User not found")
+                    () -> new NotFoundException("User not found")
                 );
 
         if (!book.getAvailable()) {
-            throw new IllegalStateException("Book is not available");
+            throw new NotFoundException("Book is not available");
         }
         Optional<Cart> userCart = cartRepository.findByUser(user);
 
