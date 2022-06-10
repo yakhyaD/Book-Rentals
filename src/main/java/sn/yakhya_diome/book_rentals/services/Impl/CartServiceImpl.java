@@ -1,7 +1,9 @@
 package sn.yakhya_diome.book_rentals.services.Impl;
 
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import sn.yakhya_diome.book_rentals.exceptions.NotFoundException;
+import org.springframework.stereotype.Service;
 import sn.yakhya_diome.book_rentals.models.Book;
 import sn.yakhya_diome.book_rentals.models.Cart;
 import sn.yakhya_diome.book_rentals.models.User;
@@ -14,7 +16,9 @@ import sn.yakhya_diome.book_rentals.services.CartService;
 import java.util.Optional;
 import java.util.Set;
 
-public class CartServiceimpl implements CartService {
+@Service
+@Slf4j
+public class CartServiceImpl implements CartService {
 
     @Autowired
     private BookRepository bookRepository;
@@ -32,25 +36,27 @@ public class CartServiceimpl implements CartService {
     public Optional<Cart> getUserCart(String token){
         String username = jwtUtils.getUserNameFromJwtToken(token.substring(7));
         User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new NotFoundException("User not found")
+                () -> new IllegalStateException("User not found")
         );
 
+//        Cart cart = cartRepository.findByUserId(user.getId());
+//        log.info("cart: {}", cart.toString());
         return cartRepository.findByUser(user);
     }
 
     @Override
     public String addToCart(Long bookId, String token) {
         Book book = bookRepository.findById(bookId).orElseThrow(() ->
-                new NotFoundException(String.format("Book with id %d doesn't exist", bookId))
+                new IllegalStateException(String.format("Book with id %d doesn't exist", bookId))
         );
         User user = userRepository.findByUsername(jwtUtils
                 .getUserNameFromJwtToken(token.substring(7)))
                 .orElseThrow(
-                    () -> new NotFoundException("User not found")
+                    () -> new IllegalStateException("User not found")
                 );
 
         if (!book.getAvailable()) {
-            throw new NotFoundException("Book is not available");
+            throw new IllegalStateException("Book is not available");
         }
         Optional<Cart> userCart = cartRepository.findByUser(user);
 
@@ -67,24 +73,25 @@ public class CartServiceimpl implements CartService {
             userCart.get().setBooks(cartBooks);
             cartRepository.save(userCart.get());
         }
-
+        book.setAvailable(false);
+        bookRepository.save(book);
         return "Book added to cart successfully";
     }
 
     @Override
-    public void deleteFromCart(Long bookId, String token) {
+    public void removeFromCart(Long bookId, String token) {
         Book book = bookRepository.findById(bookId).orElseThrow(() ->
-                new NotFoundException(String.format("Book with id %d doesn't exist", bookId))
+                new IllegalStateException(String.format("Book with id %d doesn't exist", bookId))
         );
         User user = userRepository.findByUsername(jwtUtils
                 .getUserNameFromJwtToken(token.substring(7)))
                 .orElseThrow(
-                    () -> new NotFoundException("User not found")
+                    () -> new IllegalStateException("User not found")
                 );
         Optional<Cart> userCart = cartRepository.findByUser(user);
 
         if(userCart.isEmpty()){
-            throw new NotFoundException("Cart not found");
+            throw new IllegalStateException("Cart not found");
         }else {
             userCart.get().getBooks().remove(book);
             cartRepository.save(userCart.get());

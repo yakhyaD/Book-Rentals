@@ -1,5 +1,6 @@
 package sn.yakhya_diome.book_rentals.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -39,16 +40,8 @@ public class Book {
     // one book has one publisher(user)
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User publisher;
-
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "cart_id", nullable = true)
-//    private Cart cart;
-//
-//    @ManyToOne(fetch = FetchType.EAGER)
-//    @JoinColumn(name = "rent_id")
-//    private RentDetails rentDetails;
-
 
     private String coverUrl;
 

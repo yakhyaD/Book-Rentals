@@ -9,7 +9,7 @@ public interface CartService {
 
     String addToCart(Long bookId, String token);
 
-    void deleteFromCart(Long bookId, String token);
+    void removeFromCart(Long bookId, String token);
 
     void destroyCart(Long cartId);
 }
