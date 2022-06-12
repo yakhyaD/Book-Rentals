@@ -44,7 +44,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public String addToCart(Long bookId, String token) {
         Book book = bookRepository.findById(bookId).orElseThrow(() ->
-                new IllegalStateException(String.format("Book with id %d doesn't exist", bookId))
+                new NotFoundException(String.format("Book with id %d doesn't exist", bookId))
         );
         User user = userRepository.findByUsername(jwtUtils
                 .getUserNameFromJwtToken(token.substring(7)))
@@ -99,4 +99,6 @@ public class CartServiceImpl implements CartService {
     public void destroyCart(Long cartId) {
         cartRepository.deleteById(cartId);
     }
+
+
 }

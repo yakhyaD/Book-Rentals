@@ -57,6 +57,7 @@ public class AppSecurityConfig {
                 .authorizeHttpRequests((auth) -> auth
                         .antMatchers("/api/v1/auth/**").permitAll()
                         .antMatchers( "/api/v1/books/**").permitAll()
+                        .antMatchers( "/api/v1/user/cart").authenticated()
                         .antMatchers( "/api/v1/user/**").permitAll()
                         .anyRequest().authenticated()
                 )

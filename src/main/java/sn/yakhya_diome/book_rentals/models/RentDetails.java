@@ -3,6 +3,7 @@ package sn.yakhya_diome.book_rentals.models;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -21,16 +22,16 @@ public class RentDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY)
     private Set<Book> books = new HashSet<>();
 
     private Boolean returned = false;
 
-    private Date rentDate;
-    private Date returnDate;
+    private LocalDateTime rentDate;
+    private LocalDateTime returnDate;
 
 }

@@ -22,7 +22,7 @@ public class Cart {
     @JsonIgnore
     private Long id;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY)
     private Set<Book> books;
 
     @JsonIgnore
