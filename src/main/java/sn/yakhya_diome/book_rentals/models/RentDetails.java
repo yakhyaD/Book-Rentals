@@ -22,7 +22,7 @@ public class RentDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -30,6 +30,8 @@ public class RentDetails {
     private Set<Book> books = new HashSet<>();
 
     private Boolean returned = false;
+
+    private Boolean expired = false;
 
     private LocalDateTime rentDate;
     private LocalDateTime returnDate;

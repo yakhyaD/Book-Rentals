@@ -45,4 +45,9 @@ public class CartController {
     private void validateCommand(@RequestHeader("Authorization") String token){
         rentService.createRent(token);
     }
+
+    @PostMapping("senEmail")
+    private void sendEmail(@RequestBody String email){
+        rentService.remindRentExpiration();
+    }
 }
